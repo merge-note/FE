@@ -1,14 +1,11 @@
-import React from "react";
-import Sections from "@/components/LandingPage/Sections";
-import Header from "@/components/LandingPage/Header";
+import tw from "twin.macro";
 
-const index = () => {
-  return (
-    <div className="h-fit flex flex-col">
-      <Header />
-      <Sections />
-    </div>
-  );
+const Test = tw.div`w-screen h-screen bg-amber-100`;
+
+type Props = {};
+
+const index = (props: Props) => {
+  return <Test>index</Test>;
 };
 
 export default index;
