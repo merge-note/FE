@@ -1,5 +1,11 @@
 import tw from "twin.macro";
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import {
   createEditor,
   BaseEditor,
@@ -23,6 +29,7 @@ import {
   useSensor,
   useSensors,
   useDraggable,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   useSortable,
@@ -30,7 +37,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AddIdEditor, makeNodeId } from "./Editor";
+import { AddIdEditor, makeNodeId } from "@/utils/Editor";
 
 type CustomElement = { type: "paragraph"; children: CustomText[]; id: string };
 type CustomText = { text: string };
@@ -52,20 +59,66 @@ const initialValue: Descendant[] = [
   },
 ];
 
-//메모 밸류
+//에디터
+const useAddIdEditor = () =>
+  useMemo(() => AddIdEditor(withReact(createEditor())), []);
+
+const DraggableItem = ({ id, content }) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+
+  const style = {
+    padding: "2px",
+    width: "100%",
+    height: "50px",
+    margin: "2px",
+    backgroundColor: "red",
+    cursor: "pointer",
+    transform: CSS.Transform.toString(transform),
+  };
+
+  return (
+    <div ref={setNodeRef} {...attributes} {...listeners} style={style}>
+      {content}
+    </div>
+  );
+};
+
 const memoContents = [
   { id: "1", content: "내용1" },
   { id: "2", content: "내용2" },
 ];
 
-const useAddIdEditor = () =>
-  useMemo(() => AddIdEditor(withReact(createEditor())), []);
+const App = () => {
+  const [activeMemoId, setActiveMemoId] = useState(null);
+  const Memosensors = useSensors(useSensor(PointerSensor));
+  const textContainerRef = useRef<HTMLDivElement>(null);
 
-const index = () => {
+  const handleMemoDragStart = (event) => {
+    setActiveMemoId(event.active.id);
+  };
+
+  const handleMemoDragEnd = (event) => {
+    const activeMemo = memoContents.find((memo) => memo.id === event.active.id);
+    if (activeMemo) {
+      const newElement: CustomElement = {
+        type: "paragraph",
+        children: [{ text: activeMemo.content }],
+        id: makeNodeId(),
+      };
+      Transforms.insertNodes(editor, newElement);
+      setValue([...value, newElement]);
+    }
+    setActiveMemoId(null);
+  };
+
+  const activeMemo = activeMemoId
+    ? memoContents.find((memo) => memo.id === activeMemoId)
+    : null;
+
   const editor = useAddIdEditor();
   const sensors = useSensors(useSensor(PointerSensor));
   const [activeId, setActiveId] = useState(null);
-  const [activeMemoId, setActiveMemoId] = useState(null);
+
   const activeElement = editor.children.find(
     (x) => Element.isElement(x) && x.id === activeId
   );
@@ -154,53 +207,53 @@ const index = () => {
   return (
     <Test>
       <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        sensors={Memosensors}
+        onDragStart={handleMemoDragStart}
+        onDragEnd={handleMemoDragEnd}
       >
-        <TextContainer>
-          <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            <Slate
-              editor={editor}
-              value={value}
-              onChange={(newValue) => {
-                setValue(newValue);
-              }}
+        <DndContext
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <TextContainer ref={textContainerRef}>
+            <SortableContext
+              items={items}
+              strategy={verticalListSortingStrategy}
             >
-              <Editable
-                renderElement={renderElement}
-                autoFocus
-                autoCorrect="false"
-              />
-            </Slate>
-          </SortableContext>
-        </TextContainer>
-        <Memo>
-          {memoContents.map((memo) => {
-            const { attributes, listeners, setNodeRef } = useDraggable({
-              id: memo.id,
-            });
-
-            return (
-              <div
-                key={memo.id}
-                ref={setNodeRef}
-                {...attributes}
-                {...listeners}
-                style={{ cursor: "pointer" }}
+              <Slate
+                editor={editor}
+                value={value}
+                onChange={(newValue) => {
+                  setValue(newValue);
+                }}
               >
-                {memo.content}
-              </div>
-            );
-          })}
+                <Editable
+                  renderElement={renderElement}
+                  autoFocus
+                  autoCorrect="false"
+                />
+              </Slate>
+            </SortableContext>
+          </TextContainer>
+        </DndContext>
+        <Memo>
+          {memoContents.map((memo) => (
+            <DraggableItem key={memo.id} id={memo.id} content={memo.content} />
+          ))}
         </Memo>
+        <DragOverlay>
+          {activeMemo ? (
+            <DraggableItem id={activeMemo.id} content={activeMemo.content} />
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </Test>
   );
 };
 
-export default index;
+export default App;
 
 const Test = tw.div`w-screen h-screen bg-amber-100 flex p-10`;
-const Memo = tw.div`w-96 bg-amber-800`;
+const Memo = tw.div`w-96 bg-amber-800 p-2`;
 const TextContainer = tw.div`w-[calc(100%_-_24rem)] break-all`;
