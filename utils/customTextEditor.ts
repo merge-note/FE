@@ -1,17 +1,42 @@
+import { useMemo } from "react";
+
 import {
   Editor,
+  createEditor,
   Element as SlateElement,
   Operation,
-  Node,
+  Descendant,
+  BaseEditor,
   Text as SlateText,
 } from "slate";
+
+import { ReactEditor, withReact } from "slate-react";
+
 import { nanoid } from "nanoid";
 
 type CustomElementWithId = SlateElement & { id: string };
-type CustomText = SlateText;
+
 type CustomNode = Editor | CustomElementWithId | CustomText;
+type CustomElement = { type: "paragraph"; children: CustomText[]; id: string };
+type CustomText = { text: string };
+
+declare module "slate" {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor;
+    Element: CustomElement;
+    Text: CustomText;
+  }
+}
 
 export const makeNodeId = (): string => nanoid(16);
+
+export const initialValue: Descendant[] = [
+  {
+    type: "paragraph",
+    children: [{ text: "" }],
+    id: makeNodeId(),
+  },
+];
 
 export const addNodeId = (node: CustomNode): void => {
   if (SlateElement.isElement(node)) {
@@ -42,3 +67,6 @@ export const AddIdEditor = (editor: Editor): Editor => {
 
   return editor;
 };
+
+export const useAddIdEditor = () =>
+  useMemo(() => AddIdEditor(withReact(createEditor())), []);
