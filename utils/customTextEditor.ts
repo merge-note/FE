@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import {
   Editor,
   createEditor,
@@ -11,7 +9,6 @@ import {
 } from "slate";
 
 import { ReactEditor, withReact } from "slate-react";
-
 import { nanoid } from "nanoid";
 
 type CustomElementWithId = SlateElement & { id: string };
@@ -68,5 +65,4 @@ export const AddIdEditor = (editor: Editor): Editor => {
   return editor;
 };
 
-export const useAddIdEditor = () =>
-  useMemo(() => AddIdEditor(withReact(createEditor())), []);
+export const useAddIdEditor = () => AddIdEditor(withReact(createEditor()));

@@ -1,6 +1,6 @@
 import { DefaultElement, RenderElementProps } from "slate-react";
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS, Transform } from "@dnd-kit/utilities";
+import { CSS } from "@dnd-kit/utilities";
 
 const DragHandle = (props) => {
   const { attributes, listeners } = props;

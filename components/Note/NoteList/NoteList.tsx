@@ -7,12 +7,11 @@ const HeaderBar = tw.div`h-12 shrink-0 flex items-center justify-between`;
 const Headding = tw.h1`text-[42px] font-bold leading-[46px] text-[#21272A]`;
 const FilterBar = tw.div`w-full h-12 shrink-0 flex items-center justify-between `;
 const ButtonList = tw.div`h-full flex gap-6`;
-const List = tw.div`h-full grid grid-cols-3 grid-rows-2 gap-6`;
+const List = tw.div`h-full grid grid-cols-5 grid-rows-2 gap-6`;
 const Item = tw.div`bg-pink-200`;
 const Title = tw.h2`text-xl font-semibold truncate max-h-[3rem] overflow-hidden`;
 const Content = tw.p`text-base max-h-[6.25rem] overflow-hidden`;
 const ButtonContainer = tw.div`h-[24px]`;
-const Pagenation = tw.div`h-12 shrink-0 bg-blue-400`;
 const AddButton = tw.div`flex gap-2 text-[#0F62FE] cursor-pointer`;
 
 interface ButtonProps {
@@ -80,7 +79,6 @@ const NoteFilter = () => {
           <ButtonContainer />
         </Item>
       </List>
-      <Pagenation />
     </NoteContentWrapper>
   );
 };

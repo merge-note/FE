@@ -1,6 +1,4 @@
-import React from "react";
 import tw from "twin.macro";
-
 import VerticalNav from "@/components/common/VerticalNav";
 import Memo from "@/components/Memo/Memo";
 import NoteList from "@/components/Note/NoteList/NoteList";
@@ -13,7 +11,6 @@ const index = () => {
     <Container>
       <VerticalNav />
       <NoteEdit />
-      {/* <NoteList /> */}
       <Memo />
     </Container>
   );

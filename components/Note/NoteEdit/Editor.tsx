@@ -1,14 +1,14 @@
-import React, {
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-  useEffect,
-} from "react";
+import React, { useMemo, useCallback, useRef, useEffect } from "react";
 import tw from "twin.macro";
 import styled from "styled-components";
 import { Element, Transforms, Point, Editor as SlateEditor } from "slate";
-import { Slate, Editable, RenderElementProps, ReactEditor } from "slate-react";
+import {
+  Slate,
+  Editable,
+  RenderElementProps,
+  ReactEditor,
+  DefaultElement,
+} from "slate-react";
 import {
   DndContext,
   PointerSensor,
@@ -16,21 +16,27 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
+  useSortable,
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-import { useAddIdEditor, initialValue } from "@/utils/customTextEditor";
-import CustomElement from "./CustomElement";
+import { useAtom } from "jotai";
+import {
+  activeElementIdAtom,
+  noteEditorValueAtom,
+  editorAtom,
+} from "@/atoms/noteAtoms";
 
-type Props = {};
+import EditorToolbar from "./EditorToolbar";
 
-const Editor = (props: Props) => {
-  const [activeId, setActiveId] = useState(null);
-  const [value, setValue] = useState(initialValue);
+const Editor = () => {
+  const [editor] = useAtom(editorAtom);
+  const [activeId, setActiveId] = useAtom(activeElementIdAtom);
+  const [value, setValue] = useAtom(noteEditorValueAtom);
   const textContainerRef = useRef<HTMLDivElement>(null);
 
-  const editor = useAddIdEditor();
   const sensors = useSensors(useSensor(PointerSensor));
 
   useEffect(() => {
@@ -74,12 +80,40 @@ const Editor = (props: Props) => {
   };
 
   const renderElement = useCallback((props: RenderElementProps) => {
-    return <CustomElement {...props} />;
+    const { attributes, listeners, setNodeRef, transform, transition } =
+      useSortable({
+        id: props.element.id,
+      });
+
+    const style = {
+      display: "flex",
+      padding: "2px",
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...attributes}>
+        <div
+          contentEditable={false}
+          style={{
+            marginRight: "10px",
+            cursor: "pointer",
+            width: "10px",
+            height: "auto",
+            backgroundColor: "black",
+          }}
+          {...attributes}
+          {...listeners}
+        ></div>
+        <DefaultElement {...props} />
+      </div>
+    );
   }, []);
 
   return (
     <NoteEditor>
-      <Toolbar />
+      <EditorToolbar />
       <TextContainer>
         <DndContext
           sensors={sensors}
