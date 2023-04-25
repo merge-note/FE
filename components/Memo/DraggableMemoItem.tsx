@@ -4,7 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import Trash from "../../public/icons/Trash.svg";
 import Pencil from "../../public/icons/Pencil.svg";
 
-const DraggableMemoItem = ({ id, content }) => {
+const DraggableMemoItem = ({ id, content, createdAt }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
 
   const style = {
@@ -14,7 +14,7 @@ const DraggableMemoItem = ({ id, content }) => {
   return (
     <MemoItem ref={setNodeRef} {...attributes} {...listeners} style={style}>
       <MemoItemHeader>
-        <p>2023.04.23 01:00</p>
+        <p>{createdAt}</p>
         <Buttons>
           <Trash width="14" height="14" />
           <Pencil width="14" height="14" />
