@@ -35,7 +35,6 @@ const Editor = () => {
   const [editor] = useAtom(editorAtom);
   const [activeId, setActiveId] = useAtom(activeElementIdAtom);
   const [value, setValue] = useAtom(noteEditorValueAtom);
-  const textContainerRef = useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -114,43 +113,37 @@ const Editor = () => {
   return (
     <NoteEditor>
       <EditorToolbar />
-      <TextContainer>
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <TextContainer ref={textContainerRef}>
-            <SortableContext
-              items={items}
-              strategy={verticalListSortingStrategy}
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <TextContainer>
+          <SortableContext items={items} strategy={verticalListSortingStrategy}>
+            <Slate
+              editor={editor}
+              value={value}
+              onChange={(newValue) => {
+                setValue(newValue);
+              }}
             >
-              <Slate
-                editor={editor}
-                value={value}
-                onChange={(newValue) => {
-                  setValue(newValue);
-                }}
-              >
-                <StyledEditable
-                  renderElement={renderElement}
-                  autoFocus
-                  autoCorrect="false"
-                />
-              </Slate>
-            </SortableContext>
-          </TextContainer>
-        </DndContext>
-      </TextContainer>
+              <StyledEditable
+                renderElement={renderElement}
+                autoFocus
+                autoCorrect="false"
+              />
+            </Slate>
+          </SortableContext>
+        </TextContainer>
+      </DndContext>
     </NoteEditor>
   );
 };
 
 export default Editor;
 
-const NoteEditor = tw.div`h-full px-4 py-2 bg-blue-500`;
-const Toolbar = tw.div`h-6 bg-red-500 shrink-0`;
-const TextContainer = tw.div`h-[calc(100%_-_24px)] bg-amber-200`;
+const NoteEditor = tw.div`h-full flex flex-col px-4 py-2 bg-blue-500`;
+const TextContainer = tw.div`h-[calc(100%_-_24px)] max-h-[calc(100%_-_24px)] bg-amber-200 overflow-y-scroll`;
 const StyledEditable = styled(Editable)`
   font-size: 18px;
   color: #343a3f;
