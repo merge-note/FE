@@ -16,7 +16,7 @@ import {
   activeMemoIdAtom,
   noteEditorValueAtom,
 } from "@/atoms/noteAtoms";
-import { memoSearchQueryAtom } from "@/atoms/quickMemoAtoms";
+import { memoSearchQueryAtom, memoModeAtom } from "@/atoms/quickMemoAtoms";
 import { getMemos } from "@/apis/quickMemos";
 import { makeNodeId } from "@/utils/customTextEditor";
 import { useModal, Modal } from "./MemoModal";
@@ -33,6 +33,7 @@ const Memo = () => {
   const [memoSearchQuery, setMemoSearchQuery] = useAtom(memoSearchQueryAtom);
   const [searchInput, setSearchInput] = useState("");
 
+  const [, setMemoMode] = useAtom(memoModeAtom);
   const [memos] = useAtom(getMemos);
   const memoData = memos.data?.memos ?? [];
   const activeMemo = memoData.find((memo) => memo.id === activeMemoId);
@@ -97,7 +98,14 @@ const Memo = () => {
   return (
     <MemoWrapper>
       <Modal isOpen={isOpen} onClose={closeModal}></Modal>
-      <Button onClick={openModal}>Add Memo</Button>
+      <Button
+        onClick={() => {
+          openModal();
+          setMemoMode("add");
+        }}
+      >
+        Add Memo
+      </Button>
       <InputBox>
         <Search width={24} height={24} />
         <Input onChange={handleChange} />
@@ -115,6 +123,7 @@ const Memo = () => {
               id={memo.id}
               content={memo.content}
               createdAt={memo.created_at}
+              openModal={openModal}
             />
           ))}
         </MemoList>
@@ -137,9 +146,7 @@ const Memo = () => {
 
 export default Memo;
 
-// const MemoList = tw.div`w-full h-full flex flex-col gap-1 box-border`;
-const MemoList = tw.div`w-full h-full flex flex-col gap-1 box-border grow`;
-
+const MemoList = tw.div`w-full h-full flex flex-col gap-1`;
 const MemoWrapper = tw.div`w-80 h-full px-4 py-6 shrink-0 flex flex-col gap-4 bg-[#FFFFFF] border-l border-l-[#DDE1E6] overflow-hidden`;
 const Button = tw.button`w-full h-12 px-3 py-4 flex items-center justify-center text-center text-[#0F62FE] border-2 border-[#0f62fe] hover:bg-[#0F62FE] hover:text-white`;
 const InputBox = tw.div`w-full h-12 bg-[#F2F4F8] px-4 py-3 flex flex-row gap-2`;

@@ -1,34 +1,56 @@
 import { useState, useRef, useEffect } from "react";
+import { useAtom } from "jotai";
 import Close from "../../public/icons/Close.svg";
 import tw from "twin.macro";
 
-import { addMemo } from "@/apis/quickMemos";
+import { addMemo, editMemo } from "@/apis/quickMemos";
+import { selectedMemoAtom, memoModeAtom } from "@/atoms/quickMemoAtoms";
 
 // 모달 컴포넌트
 export const Modal = ({ isOpen, onClose }) => {
   const addMemoMutation = addMemo();
+  const editMemoMutation = editMemo();
+
+  const [selectedMemo, setSelectedMemo] = useAtom(selectedMemoAtom);
+  const [memoMode, setMemoMode] = useAtom(memoModeAtom);
+
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       contentRef.current?.focus();
+      if (memoMode === "view" || memoMode === "edit") {
+        contentRef.current!.value = selectedMemo.content;
+        contentRef.current!.readOnly = memoMode === "view";
+      } else {
+        contentRef.current!.value = "";
+        contentRef.current!.readOnly = false;
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, selectedMemo, memoMode]);
 
-  const handleAddMemo = () => {
+  const handleMemo = () => {
     const newMemo = {
       content: contentRef.current!.value,
     };
-    addMemoMutation.mutate(newMemo);
+    if (memoMode === "edit") {
+      setSelectedMemo({
+        id: selectedMemo.id,
+        content: contentRef.current!.value,
+      });
+      editMemoMutation.mutate();
+    } else if (memoMode === "add") {
+      addMemoMutation.mutate(newMemo);
+    }
     onClose();
   };
 
   return isOpen ? (
-    <ModalContainer onClick={handleAddMemo}>
+    <ModalContainer onClick={handleMemo}>
       <ModalBody onClick={(event) => event.stopPropagation()}>
         <ModalHeader>
           <p>Memo</p>
-          <Close onClick={handleAddMemo} css={tw`cursor-pointer`} />
+          <Close onClick={handleMemo} css={tw`cursor-pointer`} />
         </ModalHeader>
         <ModalInput ref={contentRef} />
       </ModalBody>

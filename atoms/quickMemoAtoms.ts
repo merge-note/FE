@@ -8,7 +8,9 @@ export const memoSearchQueryAtom = atom<string>("");
 export const selectedMemoIdAtom = atom<number | null>(null);
 export const toggleMemoIdAtom = atom<number | null>(null);
 
-export const memoModeAtom = atom<MemoMode>("add");
+export const memoModeAtom = atom<MemoMode>("view");
+
+export const selectedMemoAtom = atom({ id: 0, content: "" });
 
 export const isMemoFormVisibleAtom = atom<boolean>(false);
 

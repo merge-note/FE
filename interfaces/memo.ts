@@ -13,6 +13,11 @@ export interface MemoContent {
   content: string;
 }
 
+export interface MemoContentWithId {
+  id: number;
+  content: string;
+}
+
 export interface MemoListWithCount {
   memos: Memo[];
   pageCount: number;
