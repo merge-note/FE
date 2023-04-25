@@ -3,9 +3,16 @@ import {
   currentPageNumberAtom,
   memoSearchQueryAtom,
   selectedMemoIdAtom,
+  selectedMemoAtom,
 } from "@/atoms/quickMemoAtoms";
 import { atomsWithQuery } from "jotai-tanstack-query";
-import { MemoListWithCount, MemoBody, Memo } from "@/interfaces/memo";
+import {
+  MemoListWithCount,
+  MemoBody,
+  Memo,
+  MemoContent,
+  MemoContentWithId,
+} from "@/interfaces/memo";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 
@@ -56,7 +63,7 @@ export const addMemo = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (memo: MemoBody) => {
+    async (memo: MemoContent) => {
       try {
         const url = "/memos";
         const res = await axiosConfig.post<MemoListWithCount>(url, memo);
@@ -110,14 +117,14 @@ export const deleteMemo = () => {
 export const editMemo = () => {
   const [currentPageNumber] = useAtom(currentPageNumberAtom);
   const [searchQuery] = useAtom(memoSearchQueryAtom);
-  const [selectedMemoId] = useAtom(selectedMemoIdAtom);
+  const [selectedMemo] = useAtom(selectedMemoAtom);
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (memo: MemoBody) => {
+    async () => {
       try {
-        const url = `/memos/${selectedMemoId}`;
-        const res = await axiosConfig.put<MemoBody>(url, memo);
+        const url = `/memos/${selectedMemo.id}`;
+        const res = await axiosConfig.put<MemoContent>(url, selectedMemo);
         return res.data;
       } catch (error) {
         throw new Error("Failed to edit memo");
@@ -130,7 +137,7 @@ export const editMemo = () => {
           currentPageNumber,
           searchQuery,
         ]);
-        queryClient.invalidateQueries(["memo", selectedMemoId]);
+        queryClient.invalidateQueries(["memo", selectedMemo]);
       },
       onError: (error) => {
         throw new Error("Failed to edit memo");

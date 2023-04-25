@@ -3,7 +3,11 @@ import axios from "axios";
 import { AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import { SignInInfo, SignUpInfo, SignUpInfoWithVerificationCode } from "@/interfaces/user";
+import {
+  SignInInfo,
+  SignUpInfo,
+  SignUpInfoWithVerificationCode,
+} from "@/interfaces/user";
 
 const BASE_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/user`;
 

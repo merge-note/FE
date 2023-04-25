@@ -2,8 +2,9 @@
 
 const path = require("path");
 const Dotenv = require("dotenv-webpack");
+const withTwin = require("./withTwin.js");
 
-const nextConfig = {
+const nextConfig = withTwin({
   reactStrictMode: true,
   webpack(config) {
     config.module.rules.push({
@@ -17,6 +18,6 @@ const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
-};
+});
 
 module.exports = nextConfig;
