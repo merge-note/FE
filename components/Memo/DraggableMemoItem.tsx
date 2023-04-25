@@ -1,14 +1,23 @@
 import tw from "twin.macro";
 import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
 import Trash from "../../public/icons/Trash.svg";
 import Pencil from "../../public/icons/Pencil.svg";
 
+import { deleteMemo } from "@/apis/quickMemos";
+
 const DraggableMemoItem = ({ id, content, createdAt }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id,
+  });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    backgroundColor: isDragging ? "#ddd" : "#fff", // isDragging 값에 따라 배경색 변경
+  };
+
+  const deleteMutation = deleteMemo();
+
+  const handleDelete = (memoId: number) => {
+    deleteMutation.mutate(memoId);
   };
 
   return (
@@ -16,17 +25,24 @@ const DraggableMemoItem = ({ id, content, createdAt }) => {
       <MemoItemHeader>
         <p>{createdAt}</p>
         <Buttons>
-          <Trash width="14" height="14" />
+          <Trash
+            width="14"
+            height="14"
+            onClick={() => {
+              handleDelete(id);
+            }}
+          />
           <Pencil width="14" height="14" />
         </Buttons>
       </MemoItemHeader>
-      {content}
+      <MemoItemContent>{content}</MemoItemContent>
     </MemoItem>
   );
 };
 
 export default DraggableMemoItem;
 
-const MemoItem = tw.div`h-1/5 bg-[#fff] border border-[#DDE1E6] px-3 py-2`;
+const MemoItem = tw.div` w-full h-1/5 bg-[#fff] border border-[#DDE1E6] px-3 py-2 line-clamp-3 overflow-hidden`;
 const MemoItemHeader = tw.div`h-6 flex items-center justify-between text-xs text-[#697077]`;
+const MemoItemContent = tw.p`line-clamp-3 overflow-hidden`;
 const Buttons = tw.div`flex gap-2`;

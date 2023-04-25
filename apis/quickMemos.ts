@@ -5,7 +5,12 @@ import {
   selectedMemoIdAtom,
 } from "@/atoms/quickMemoAtoms";
 import { atomsWithQuery } from "jotai-tanstack-query";
-import { MemoListWithCount, MemoBody, Memo } from "@/interfaces/memo";
+import {
+  MemoListWithCount,
+  MemoBody,
+  Memo,
+  MemoContent,
+} from "@/interfaces/memo";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAtom } from "jotai";
 
@@ -56,7 +61,7 @@ export const addMemo = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (memo: MemoBody) => {
+    async (memo: MemoContent) => {
       try {
         const url = "/memos";
         const res = await axiosConfig.post<MemoListWithCount>(url, memo);

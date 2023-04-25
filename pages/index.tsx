@@ -11,6 +11,7 @@ const index = () => {
     <Container>
       <VerticalNav />
       <NoteEdit />
+      {/* <NoteList /> */}
       <Memo />
     </Container>
   );

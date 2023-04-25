@@ -9,6 +9,10 @@ export interface MemoBody {
   content: string;
 }
 
+export interface MemoContent {
+  content: string;
+}
+
 export interface MemoListWithCount {
   memos: Memo[];
   pageCount: number;

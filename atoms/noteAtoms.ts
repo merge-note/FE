@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { atom } from "jotai";
 import { initialValue, useAddIdEditor } from "@/utils/customTextEditor";
 
@@ -13,6 +14,3 @@ export const activeElementIdAtom = atom(null);
 
 //노트 벨류.
 export const noteEditorValueAtom = atom(initialValue);
-
-//메모 벨류
-export const memoContentsAtom = atom([]);
